@@ -1,0 +1,11 @@
+using BlazorPieShop.Dtos;
+
+namespace BlazorPieShop.Services;
+
+public interface IWordleService
+{
+    public Task<string> GetFirstGuessAsync();
+
+    public Task<string> GetNextGuessAsync(GetNextGuessDto dto);
+    
+}
