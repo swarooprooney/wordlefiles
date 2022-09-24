@@ -1,0 +1,52 @@
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using BlazorPieShop.Dtos;
+using JsonSerializerOptions = System.Text.Json.JsonSerializerOptions;
+
+namespace BlazorPieShop.Services;
+
+public class WordleService : IWordleService
+{
+    private readonly IHttpClientFactory _factory;
+    private readonly HttpClient _httpClient;
+
+    // public WordleService(HttpClient httpClient)
+    // {
+    //     _httpClient = httpClient;
+    // }
+
+    public WordleService(IHttpClientFactory factory)
+    {
+        _httpClient = factory.CreateClient("WordleClient");
+    }
+
+    public async Task<string> GetFirstGuessAsync()
+    {
+        var response = await _httpClient.GetStringAsync(Constants.GetFirstGuess);
+        return response;
+    }
+
+    public async Task<string> GetNextGuessAsync(GetNextGuessDto dto)
+    {
+        // var jsonContent = JsonConvert.SerializeObject(dto);
+        // var contentString = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+        // contentString.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        // var response = await _httpClient.PostAsync(Constants.GetNextGuess, contentString);
+        //
+        // var finalResponse =await response.Content.ReadAsStringAsync();
+        // return finalResponse;
+        
+        
+        var response = await _httpClient.PostAsJsonAsync(Constants.GetNextGuess, dto);
+        var resultStr = await response.Content.ReadAsStringAsync();
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+        };
+        var answer = JsonSerializer.Deserialize<NextGuessDto>(resultStr);
+        return answer.guess;
+    }
+}
